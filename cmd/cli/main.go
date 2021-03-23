@@ -4,27 +4,29 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/kaynetik/ax/cmd/cli/flags"
+
 	"github.com/kaynetik/ax"
 )
 
 const (
 	oneInt = int(1)
 
-	flagCompareHelp    = "-help"
-	flagCompareArchive = "-archive"
+	flagCompareHelp      = "-help"
+	flagCompareArchiveIn = "-arc-in"
 )
 
 func main() {
 	args := os.Args
 
-	flags := parseAllFlags()
+	cmdScan := flags.ParseAllFlags()
 
 	if compareFirstArg(flagCompareHelp, args) {
 		printHelp()
 	}
 
-	if compareFirstArg(flagCompareArchive, args) {
-		conf := prepareConfigForArchiving(flags)
+	if compareFirstArg(flagCompareArchiveIn, args) {
+		conf := prepareConfigForArchiving(cmdScan)
 
 		err := archive(conf)
 		if err != nil {
@@ -46,13 +48,14 @@ func archive(conf *ax.Config) error {
 	return nil
 }
 
-func prepareConfigForArchiving(scannedFlags *cmdScan) *ax.Config {
+func prepareConfigForArchiving(scannedFlags *flags.CmdScan) *ax.Config {
 	zc := ax.NewDefaultZipConfig()
+	zc.Password = scannedFlags.PasswordByte
 
 	return &ax.Config{
-		PathToArchive:  scannedFlags.pathToArchive,
-		OutputPath:     "",
-		NewArchiveName: "",
+		PathToArchive:  scannedFlags.PathToArchive,
+		OutputPath:     scannedFlags.ArchiveOutPath,
+		NewArchiveName: scannedFlags.NewArchiveName,
 		ZipConfig:      &zc,
 	}
 }

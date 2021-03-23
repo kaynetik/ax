@@ -97,6 +97,9 @@ type ZipConfig struct {
 	// DictSize - default setting '-md=64m.
 	DictSize uint16
 
+	// ApplyPassword - if true, then password flag for 7zip cmd will be used.
+	ApplyPassword bool
+
 	// HeadersEncryption - default setting '-mhe=on'. Enables Headers encryption.
 	HeadersEncryption bool // -he=on
 
@@ -170,7 +173,7 @@ func buildCommandString(conf *Config) string {
 		appendToString(&cmdStr, "-mhe=on")
 	}
 
-	if zc.Password != nil {
+	if zc.Password != nil && zc.ApplyPassword {
 		appendToString(&cmdStr, fmt.Sprintf("-p%s", zc.Password))
 	}
 
