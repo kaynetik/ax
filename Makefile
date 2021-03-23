@@ -12,16 +12,21 @@ build:
 update_cache:
 	curl https://sum.golang.org/lookup/github.com/kaynetik/ax@v$(VER)
 
-# TEMP COMMANDS
+# CLI COMMANDS
 
-tmp-archive:
+archive:
 	./ax -arc-in ../tmp_to_archive -arc-pass on -arc-out ../tmp_archive_out
 
-tmp-extract:
+extract:
 	./ax -arc-extract ../tmp_archive_out -arc-pass on
 
-tmp-enc:
+enc:
 	./ax -enc-in ../tmp_archive_out
 
-tmp-dec:
+dec:
 	./ax -dec-in ../tmp_archive_out
+
+push:
+	./ax -git-repo $(REPO) \
+	-arc-in ../tmp_to_archive -arc-pass on -arc-out ../tmp_archive_out  \
+	-enc-in ../tmp_archive_out

@@ -16,6 +16,7 @@ const (
 	flagNameArchiveOutPath = "arc-out"
 	flagNameNewArchiveName = "arc-name"
 	flagNameArchiveExtract = "arc-extract"
+	flagNameGitRepo        = "git-repo"
 
 	flagNameEncryptIn = "enc-in"
 	flagNameDecryptIn = "dec-in"
@@ -25,6 +26,7 @@ const (
 	flagValArchiveOutPath = "../tmp_archive_out"
 	flagValNewArchiveName = "new_archive"
 	flagValArchiveExtract = "../tmp_archive_out"
+	flagValGitRepo        = "git@github.com:USER/REPOSITORY.git"
 
 	flagValEncryptIn = "../tmp_archive_out"
 	flagValDecryptIn = "../tmp_archive_out"
@@ -34,9 +36,12 @@ const (
 	flagUsageArchiveOutPath = "Select the path where you want to store temporary Archive(s)"
 	flagUsageNewArchiveName = "Choose the name of new (temporary) Archive(s)"
 	flagUsageArchiveExtract = "Choose the path of Archive(s) location, which should be Extracted"
+	flagUsageGitRepo        = "Enter the remote GIT Repository where you wish to persist your backup"
 
 	flagUsageEncryptIn = "Select the path in which files for Encryption are located"
-	flagUsageDecryptIn = "Select the path in which files for Decryption are located"
+	flagUsageDecryptIn = "Select the path in which files for Decryption are located " +
+		"\nIf the password isn't correct, no warning will be provided, " +
+		"to disable possibility of brute forcing the correct one"
 
 	promptEnterPasswordForArchiveEncryption = "Enter Password for to protect Archive(s)"
 	promptEnterPasswordForEncryption        = "Enter Password for Archive(s) Encryption"
@@ -51,6 +56,7 @@ type CmdScan struct {
 	ArchiveOutPath           string
 	NewArchiveName           string
 	ArchiveExtract           string
+	GitRepo                  string
 	EncryptPath              string
 	DecryptPath              string
 	EncryptPassword          []byte
@@ -60,12 +66,10 @@ type CmdScan struct {
 // ParseAllFlags - parses flags from the tty and applies validation for that input.
 func ParseAllFlags() *CmdScan {
 	var (
-		err              error
-		cs               CmdScan
-		bytePassword     []byte
-		flagPass         string
-		encryptionCalled bool
-		decryptionCalled bool
+		err          error
+		cs           CmdScan
+		bytePassword []byte
+		flagPass     string
 	)
 
 	flag.StringVar(&cs.PathToArchive, flagNameArchiveIn, flagValArchiveIn, flagUsageArchiveIn)
@@ -73,15 +77,27 @@ func ParseAllFlags() *CmdScan {
 	flag.StringVar(&cs.ArchiveOutPath, flagNameArchiveOutPath, flagValArchiveOutPath, flagUsageArchiveOutPath)
 	flag.StringVar(&cs.NewArchiveName, flagNameNewArchiveName, flagValNewArchiveName, flagUsageNewArchiveName)
 	flag.StringVar(&cs.ArchiveExtract, flagNameArchiveExtract, flagValArchiveExtract, flagUsageArchiveExtract)
+	flag.StringVar(&cs.GitRepo, flagNameGitRepo, flagValGitRepo, flagUsageGitRepo)
 	flag.StringVar(&cs.EncryptPath, flagNameEncryptIn, flagValEncryptIn, flagUsageEncryptIn)
 	flag.StringVar(&cs.DecryptPath, flagNameDecryptIn, flagValDecryptIn, flagUsageDecryptIn)
 
 	flag.Parse()
 
-	encryptionCalled = strings.Contains(strings.Join(os.Args, " "), flagNameEncryptIn)
-	decryptionCalled = strings.Contains(strings.Join(os.Args, " "), flagNameDecryptIn)
+	var (
+		argsStr          string
+		archiveCalled    bool
+		encryptionCalled bool
+		decryptionCalled bool
+		pushCalled       bool
+	)
 
-	if flagPass == flagValPass && !encryptionCalled && !decryptionCalled {
+	argsStr = strings.Join(os.Args, " ")
+	encryptionCalled = strings.Contains(argsStr, flagNameEncryptIn)
+	decryptionCalled = strings.Contains(argsStr, flagNameDecryptIn)
+	archiveCalled = flagPass == flagValPass && !encryptionCalled && !decryptionCalled
+	pushCalled = encryptionCalled && cs.GitRepo != flagValGitRepo && flagPass == flagValPass
+
+	if archiveCalled || pushCalled {
 		bytePassword, err = protectedScan(promptEnterPasswordForArchiveEncryption)
 		if err != nil {
 			panic(err)
@@ -93,7 +109,7 @@ func ParseAllFlags() *CmdScan {
 		cs.ProtectArchiveWithPasswd = false
 	}
 
-	if encryptionCalled {
+	if encryptionCalled || pushCalled {
 		bytePassword, err = protectedScan(promptEnterPasswordForEncryption)
 		if err != nil {
 			panic(err)

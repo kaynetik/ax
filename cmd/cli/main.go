@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -17,6 +18,7 @@ const (
 	flagCompareArchiveExtract = "-arc-extract"
 	flagCompareEncryptIn      = "-enc-in"
 	flagCompareDecryptIn      = "-dec-in"
+	flagCompareGitRepo        = "-git-repo"
 )
 
 func main() {
@@ -24,11 +26,16 @@ func main() {
 
 	cmdScan := flags.ParseAllFlags()
 
-	if compareFirstArg(flagCompareHelp, args) {
-		printHelp()
+	if len(args) <= 1 {
+		fmt.Println("This will parse the interactive mode! WIP")
+
+		return
 	}
 
-	if compareFirstArg(flagCompareArchiveIn, args) {
+	switch args[oneInt] {
+	case flagCompareHelp:
+		printHelp()
+	case flagCompareArchiveIn:
 		conf := prepareConfigForArchiving(cmdScan)
 
 		err := archive(conf)
@@ -37,9 +44,7 @@ func main() {
 		}
 
 		return
-	}
-
-	if compareFirstArg(flagCompareArchiveExtract, args) {
+	case flagCompareArchiveExtract:
 		conf := prepareConfigForExtracting(cmdScan)
 
 		err := extract(conf)
@@ -48,9 +53,7 @@ func main() {
 		}
 
 		return
-	}
-
-	if compareFirstArg(flagCompareEncryptIn, args) {
+	case flagCompareEncryptIn:
 		fileList, err := ax.ListFiles(cmdScan.EncryptPath)
 		if err != nil {
 			panic(err)
@@ -62,9 +65,7 @@ func main() {
 		}
 
 		return
-	}
-
-	if compareFirstArg(flagCompareDecryptIn, args) {
+	case flagCompareDecryptIn:
 		fileList, err := ax.ListFiles(cmdScan.DecryptPath)
 		if err != nil {
 			panic(err)
@@ -76,6 +77,44 @@ func main() {
 		}
 
 		return
+	case flagCompareGitRepo:
+		// Cleanup
+		err := os.RemoveAll(cmdScan.ArchiveOutPath)
+		if err != nil {
+			panic(err)
+		}
+
+		// Archive
+		arcConf := prepareConfigForArchiving(cmdScan)
+
+		err = archive(arcConf)
+		if err != nil {
+			panic(err)
+		}
+
+		// Encrypt
+		fileList, err := ax.ListFiles(cmdScan.EncryptPath)
+		if err != nil {
+			panic(err)
+		}
+
+		err = ax.DefaultFileEncryption(cmdScan.EncryptPassword, fileList)
+		if err != nil {
+			panic(err)
+		}
+
+		// Push to GIT Repository
+		err = os.Chdir(cmdScan.ArchiveOutPath)
+		if err != nil {
+			panic(err)
+		}
+
+		err = ax.PushToGIT(cmdScan.GitRepo)
+		if err != nil {
+			panic(err)
+		}
+	default:
+		panic(errors.New("unknown flag provided"))
 	}
 }
 
@@ -119,16 +158,6 @@ func prepareConfigForExtracting(scannedFlags *flags.CmdScan) *ax.ExtractConfig {
 	}
 
 	return &ec
-}
-
-func compareFirstArg(flagForComparison string, args []string) bool {
-	argsLen := len(args)
-
-	if argsLen > oneInt && args[oneInt] == flagForComparison {
-		return true
-	}
-
-	return false
 }
 
 func printHelp() {
