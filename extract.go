@@ -20,7 +20,7 @@ type ExtractConfig struct {
 
 // Extract - used to extract the archive(s).
 func Extract(conf *ExtractConfig) error {
-	err := executeCommand(cmd7z, buildExtractCommandString(conf))
+	err := executeCommand(cmd7z, cmdArgsArchiveExtract(conf))
 	if err != nil {
 		return fmt.Errorf("failed executing 7zip: %w", err)
 	}
@@ -28,7 +28,9 @@ func Extract(conf *ExtractConfig) error {
 	return nil
 }
 
-func buildExtractCommandString(ec *ExtractConfig) string {
+// cmdArgsArchiveExtract - used to build command arguments for Archive Extraction process.
+// Returned string will be transformed into arguments slice which is later used for Output() func on [exec.Command].
+func cmdArgsArchiveExtract(ec *ExtractConfig) string {
 	cmdString := "x"
 
 	// Append password, if defined.

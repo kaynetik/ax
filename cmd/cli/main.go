@@ -49,28 +49,26 @@ func main() {
 	}
 }
 
-func archive(conf *ax.Config) error {
+func archive(conf *ax.ArchiveConfig) error {
 	err := ax.Archive(conf)
 	if err != nil {
 		return fmt.Errorf("an issue occurred while archiving: %w", err)
 	}
 
-	fmt.Println("Finished archiving!")
+	fmt.Println("Finished Archiving!")
 
 	return nil
 }
 
-func prepareConfigForArchiving(scannedFlags *flags.CmdScan) *ax.Config {
-	zc := ax.NewDefaultZipConfig()
-	zc.Password = scannedFlags.PasswordByte
-	zc.ApplyPassword = scannedFlags.ProtectArchiveWithPasswd
+func prepareConfigForArchiving(scannedFlags *flags.CmdScan) *ax.ArchiveConfig {
+	ac := ax.NewDefaultArchiveConfig()
+	ac.Password = scannedFlags.PasswordByte
+	ac.ApplyPassword = scannedFlags.ProtectArchiveWithPasswd
+	ac.PathToArchive = scannedFlags.PathToArchive
+	ac.OutputPath = scannedFlags.ArchiveOutPath
+	ac.NewArchiveName = scannedFlags.NewArchiveName
 
-	return &ax.Config{
-		PathToArchive:  scannedFlags.PathToArchive,
-		OutputPath:     scannedFlags.ArchiveOutPath,
-		NewArchiveName: scannedFlags.NewArchiveName,
-		ZipConfig:      &zc,
-	}
+	return &ac
 }
 
 func extract(conf *ax.ExtractConfig) error {

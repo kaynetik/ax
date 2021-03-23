@@ -23,11 +23,8 @@ var (
 	ErrPathEmpty = errors.New("path can not be empty")
 )
 
-// Config - config required for the archiving process.
-//
-// This config will be just append-only, to keep API consistency.
-// Preferred over params in order to avoid breaking API with future updates.
-type Config struct {
+// PathConfig - path config required for the archiving process.
+type PathConfig struct {
 	// PathToArchive - path which points to the directory which should be archived.
 	// Should be relative to the current working dir.
 	PathToArchive string
@@ -37,20 +34,16 @@ type Config struct {
 
 	// NewArchiveName - if set it will represent the base for the name of output archive(s).
 	NewArchiveName string
-
-	// ZipConfig - ptr to the *ZipConfig. If not set, a default one will be used.
-	// Note that default presumes 'Ultra' settings - highest compression ratio.
-	ZipConfig *ZipConfig
 }
 
 // Archive - used to create archive zip volume(s) from a chosen directory.
-func Archive(conf *Config) error {
+func Archive(conf *ArchiveConfig) error {
 	err := validatePathToArchive(conf)
 	if err != nil {
 		return fmt.Errorf("path validation issue: %w", err)
 	}
 
-	err = executeCommand(cmd7z, buildCommandString(conf))
+	err = executeCommand(cmd7z, cmdArgsArchive(conf))
 	if err != nil {
 		return fmt.Errorf("failed executing 7zip: %w", err)
 	}
@@ -58,7 +51,7 @@ func Archive(conf *Config) error {
 	return nil
 }
 
-func validatePathToArchive(conf *Config) error {
+func validatePathToArchive(conf *ArchiveConfig) error {
 	if conf.PathToArchive == "" {
 		return ErrPathEmpty
 	}
@@ -75,10 +68,15 @@ func validatePathToArchive(conf *Config) error {
 	return nil
 }
 
-// ZipConfig - represents the config required for the archiving process.
+// ArchiveConfig - represents the config required for the archiving process.
 //
 // If it's not provided, then default one will be used. Note that default setting is 'Ultra' (highest compression).
-type ZipConfig struct {
+// This config will be just append-only, to keep API consistency.
+// Preferred over params in order to avoid breaking API with future updates.
+type ArchiveConfig struct {
+	// PathConfig - embeds required path information for archiving process.
+	PathConfig
+
 	// Password - if set, it will be used to encrypt the archive.
 	Password []byte
 
@@ -145,11 +143,11 @@ const (
 	BlockSizeGByte = BlockSize("g")
 )
 
-// NewDefaultZipConfig - returns ZipConfig with default values pre-set.
+// NewDefaultArchiveConfig - returns ArchiveConfig with default values pre-set.
 //
 // Note that default setting is 'Ultra' (highest compression).
-func NewDefaultZipConfig() ZipConfig {
-	return ZipConfig{
+func NewDefaultArchiveConfig() ArchiveConfig {
+	return ArchiveConfig{
 		Password:          []byte(""),
 		ArchiveType:       archiveType,
 		BlockSize:         BlockSizeByte, // TODO: Change to mb before release
@@ -162,70 +160,71 @@ func NewDefaultZipConfig() ZipConfig {
 	}
 }
 
-func buildCommandString(conf *Config) string {
+// cmdArgsArchive - used to build command arguments for Archive Compression process.
+// Returned string will be transformed into arguments slice which is later used for Output() func on [exec.Command].
+func cmdArgsArchive(ac *ArchiveConfig) string {
 	var (
 		exportArchive struct{ name, typ string }
 		cmdStr        = "a"
-		zc            = conf.ZipConfig
 	)
 
-	if zc.HeadersEncryption {
+	if ac.HeadersEncryption {
 		appendToString(&cmdStr, "-mhe=on")
 	}
 
-	if zc.Password != nil && zc.ApplyPassword {
-		appendToString(&cmdStr, fmt.Sprintf("-p%s", zc.Password))
+	if ac.Password != nil && ac.ApplyPassword {
+		appendToString(&cmdStr, fmt.Sprintf("-p%s", ac.Password))
 	}
 
-	if zc.ArchiveType != "" {
-		exportArchive.typ = zc.ArchiveType
-		appendToString(&cmdStr, fmt.Sprintf("-t%s", zc.ArchiveType))
+	if ac.ArchiveType != "" {
+		exportArchive.typ = ac.ArchiveType
+		appendToString(&cmdStr, fmt.Sprintf("-t%s", ac.ArchiveType))
 	} else {
 		exportArchive.typ = "7z"
 	}
 
-	if zc.Compression != 0 {
-		appendToString(&cmdStr, fmt.Sprintf("-mx=%d", zc.Compression))
+	if ac.Compression != 0 {
+		appendToString(&cmdStr, fmt.Sprintf("-mx=%d", ac.Compression))
 	}
 
-	if zc.FastBytes != 0 {
-		appendToString(&cmdStr, fmt.Sprintf("-mfb=%d", zc.FastBytes))
+	if ac.FastBytes != 0 {
+		appendToString(&cmdStr, fmt.Sprintf("-mfb=%d", ac.FastBytes))
 	}
 
-	if zc.DictSize != 0 {
-		appendToString(&cmdStr, fmt.Sprintf("-md=%dm", zc.DictSize))
+	if ac.DictSize != 0 {
+		appendToString(&cmdStr, fmt.Sprintf("-md=%dm", ac.DictSize))
 	}
 
-	if zc.VolumeSize != 0 {
-		if zc.BlockSize == "" {
-			zc.BlockSize = BlockSizeMByte
+	if ac.VolumeSize != 0 {
+		if ac.BlockSize == "" {
+			ac.BlockSize = BlockSizeMByte
 		}
 
-		appendToString(&cmdStr, fmt.Sprintf("-v%d%s", zc.VolumeSize, zc.BlockSize))
+		appendToString(&cmdStr, fmt.Sprintf("-v%d%s", ac.VolumeSize, ac.BlockSize))
 	}
 
-	if zc.SolidArchive {
+	if ac.SolidArchive {
 		appendToString(&cmdStr, "-ms=on")
 	}
 
-	if conf.NewArchiveName != "" {
-		exportArchive.name = conf.NewArchiveName
+	if ac.NewArchiveName != "" {
+		exportArchive.name = ac.NewArchiveName
 	} else {
 		exportArchive.name = "archive"
 	}
 
-	if conf.OutputPath == "" {
-		conf.OutputPath = "tmp_archive"
+	if ac.OutputPath == "" {
+		ac.OutputPath = "tmp_archive"
 	}
 
 	if exportArchive.name != "" && exportArchive.typ != "" {
 		appendToString(
 			&cmdStr,
-			fmt.Sprintf("%s%c%s.%s", conf.OutputPath, os.PathSeparator, exportArchive.name, exportArchive.typ),
+			fmt.Sprintf("%s%c%s.%s", ac.OutputPath, os.PathSeparator, exportArchive.name, exportArchive.typ),
 		)
 	}
 
-	appendToString(&cmdStr, conf.PathToArchive)
+	appendToString(&cmdStr, ac.PathToArchive)
 
 	return cmdStr
 }
