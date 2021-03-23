@@ -48,9 +48,8 @@ linters:
     - gosimple
     - govet
     - ineffassign
-    - interfacer
     - lll
-    - maligned
+    #    - maligned // deprecated.
     - misspell
     - nakedret
     - nestif
