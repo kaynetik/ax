@@ -15,6 +15,8 @@ const (
 	flagCompareHelp           = "-help"
 	flagCompareArchiveIn      = "-arc-in"
 	flagCompareArchiveExtract = "-arc-extract"
+	flagCompareEncryptIn      = "-enc-in"
+	flagCompareDecryptIn      = "-dec-in"
 )
 
 func main() {
@@ -41,6 +43,34 @@ func main() {
 		conf := prepareConfigForExtracting(cmdScan)
 
 		err := extract(conf)
+		if err != nil {
+			panic(err)
+		}
+
+		return
+	}
+
+	if compareFirstArg(flagCompareEncryptIn, args) {
+		fileList, err := ax.ListFiles(cmdScan.EncryptPath)
+		if err != nil {
+			panic(err)
+		}
+
+		err = ax.DefaultFileEncryption(cmdScan.EncryptPassword, fileList)
+		if err != nil {
+			panic(err)
+		}
+
+		return
+	}
+
+	if compareFirstArg(flagCompareDecryptIn, args) {
+		fileList, err := ax.ListFiles(cmdScan.DecryptPath)
+		if err != nil {
+			panic(err)
+		}
+
+		err = ax.DefaultFileDecryption(cmdScan.DecryptPassword, fileList)
 		if err != nil {
 			panic(err)
 		}

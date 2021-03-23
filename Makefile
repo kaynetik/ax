@@ -19,3 +19,9 @@ tmp-archive:
 
 tmp-extract:
 	./ax -arc-extract ../tmp_archive_out -arc-pass on
+
+tmp-enc:
+	./ax -enc-in ../tmp_archive_out
+
+tmp-dec:
+	./ax -dec-in ../tmp_archive_out
