@@ -13,16 +13,19 @@ const (
 	flagNamePass           = "arc-pass"
 	flagNameArchiveOutPath = "arc-out"
 	flagNameNewArchiveName = "arc-name"
+	flagNameArchiveExtract = "arc-extract"
 
 	flagValArchiveIn      = "../tmp_to_archive"
 	flagValPass           = "on"
 	flagValArchiveOutPath = "../tmp_archive_out"
 	flagValNewArchiveName = "new_archive"
+	flagValArchiveExtract = "../tmp_archive_out"
 
 	flagUsageArchiveIn      = "Select the path which you wish to Archive"
 	flagUsagePass           = "If you want to be prompted for a password, or not (default on)"
 	flagUsageArchiveOutPath = "Select the path where you want to store temporary Archive(s)"
 	flagUsageNewArchiveName = "Choose the name of new (temporary) Archive(s)"
+	flagUsageArchiveExtract = "Choose the path of Archive(s) location, which should be Extracted"
 
 	promptEnterPasswordForArchiveEncryption = "Enter Password for Archive(s) Encryption"
 )
@@ -34,6 +37,7 @@ type CmdScan struct {
 	PathToArchive            string
 	ArchiveOutPath           string
 	NewArchiveName           string
+	ArchiveExtract           string
 }
 
 // ParseAllFlags - parses flags from the tty and applies validation for that input.
@@ -49,6 +53,7 @@ func ParseAllFlags() *CmdScan {
 	flag.StringVar(&flagPass, flagNamePass, flagValPass, flagUsagePass)
 	flag.StringVar(&cs.ArchiveOutPath, flagNameArchiveOutPath, flagValArchiveOutPath, flagUsageArchiveOutPath)
 	flag.StringVar(&cs.NewArchiveName, flagNameNewArchiveName, flagValNewArchiveName, flagUsageNewArchiveName)
+	flag.StringVar(&cs.ArchiveExtract, flagNameArchiveExtract, flagValArchiveExtract, flagUsageArchiveExtract)
 
 	flag.Parse()
 

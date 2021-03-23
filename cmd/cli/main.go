@@ -12,8 +12,9 @@ import (
 const (
 	oneInt = int(1)
 
-	flagCompareHelp      = "-help"
-	flagCompareArchiveIn = "-arc-in"
+	flagCompareHelp           = "-help"
+	flagCompareArchiveIn      = "-arc-in"
+	flagCompareArchiveExtract = "-arc-extract"
 )
 
 func main() {
@@ -35,6 +36,10 @@ func main() {
 
 		return
 	}
+
+	if compareFirstArg(flagCompareArchiveExtract, args) {
+		fmt.Println("extract todo")
+	}
 }
 
 func archive(conf *ax.Config) error {
@@ -51,6 +56,7 @@ func archive(conf *ax.Config) error {
 func prepareConfigForArchiving(scannedFlags *flags.CmdScan) *ax.Config {
 	zc := ax.NewDefaultZipConfig()
 	zc.Password = scannedFlags.PasswordByte
+	zc.ApplyPassword = scannedFlags.ProtectArchiveWithPasswd
 
 	return &ax.Config{
 		PathToArchive:  scannedFlags.PathToArchive,
