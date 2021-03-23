@@ -38,7 +38,14 @@ func main() {
 	}
 
 	if compareFirstArg(flagCompareArchiveExtract, args) {
-		fmt.Println("extract todo")
+		conf := prepareConfigForExtracting(cmdScan)
+
+		err := extract(conf)
+		if err != nil {
+			panic(err)
+		}
+
+		return
 	}
 }
 
@@ -64,6 +71,26 @@ func prepareConfigForArchiving(scannedFlags *flags.CmdScan) *ax.Config {
 		NewArchiveName: scannedFlags.NewArchiveName,
 		ZipConfig:      &zc,
 	}
+}
+
+func extract(conf *ax.ExtractConfig) error {
+	err := ax.Extract(conf)
+	if err != nil {
+		return fmt.Errorf("an issue occurred while etxtacting archive(s): %w", err)
+	}
+
+	fmt.Println("Finished Extracting!")
+
+	return nil
+}
+
+func prepareConfigForExtracting(scannedFlags *flags.CmdScan) *ax.ExtractConfig {
+	ec := ax.ExtractConfig{
+		Password:    scannedFlags.PasswordByte,
+		ExtractPath: scannedFlags.ArchiveExtract,
+	}
+
+	return &ec
 }
 
 func compareFirstArg(flagForComparison string, args []string) bool {

@@ -16,3 +16,6 @@ update_cache:
 
 tmp-archive:
 	./ax -arc-in ../tmp_to_archive -arc-pass on -arc-out ../tmp_archive_out
+
+tmp-extract:
+	./ax -arc-extract ../tmp_archive_out -arc-pass on
