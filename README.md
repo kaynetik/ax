@@ -6,7 +6,8 @@
 
 ![GolangCI](https://github.com/kaynetik/ax/workflows/golangci/badge.svg?branch=main)
 ![Build](https://github.com/kaynetik/ax/workflows/Build/badge.svg?branch=main)
-[![Version](https://img.shields.io/badge/version-v0.0.9-purple.svg)](https://github.com/kaynetik/ax/releases)
+[![release](https://github.com/kaynetik/ax/actions/workflows/release.yml/badge.svg)](https://github.com/kaynetik/ax/actions/workflows/release.yml)
+[![Version](https://img.shields.io/badge/version-v0.0.10-purple.svg)](https://github.com/kaynetik/ax/releases)
 
 AX provides the ability to easily create password-protected archives from chosen directory, and apply an additional
 layer of AES encryption once first iteration has been completed. Passwords which are used for Archive protection and AES
