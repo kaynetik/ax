@@ -1,6 +1,7 @@
 package flags
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"os"
@@ -138,4 +139,87 @@ func protectedScan(prompt string) ([]byte, error) {
 	}
 
 	return bytePassword, nil
+}
+
+// getScannerFn - signature of the function we expect for the ReadUserInput func.
+type getScannerFn func() *bufio.Scanner
+
+// scanner - internal struct that is used solely to wrap around bufio.Scanner.
+type scanner struct {
+	ioScanner *bufio.Scanner
+}
+
+// newScanner - returns instance of scanner, wrapper for bufio.Scanner.
+func newScanner(io *bufio.Scanner) scanner {
+	return scanner{ioScanner: io}
+}
+
+// scanWithMsg - prompts the user for input, with the provided message (prompt).
+func (s *scanner) scanWithMsg(prompt string) string {
+	fmt.Printf("\n%s: ", prompt)
+	s.ioScanner.Scan()
+
+	return s.ioScanner.Text()
+}
+
+// ReadUserInput - is used for interactive CLI mode.
+//
+// User will be prompted line by line for the required information. If something is left out, it will be ignored
+//	if not required. But if it's required then a default value will be used instead.
+// But for cases like Password for protecting the Archive - it can be left blank, but it's advised not to do so.
+func (cs *CmdScan) ReadUserInput(fn getScannerFn) {
+	// Get new bufio scanner instance [*bufio.Scanner].
+	s := newScanner(fn())
+
+	// Scan for Path which should be Archived.
+	pathToArchive := s.scanWithMsg("Path to Archive")
+	if pathToArchive != "" {
+		cs.PathToArchive = pathToArchive
+	} else {
+		cs.PathToArchive = flagValArchiveIn
+	}
+
+	// Scan for Archive Temporary Output path.
+	archOutPath := s.scanWithMsg("Path for Archive(s) Output (default '../tmp_archive_out')")
+	if archOutPath != "" {
+		cs.ArchiveOutPath = archOutPath
+	} else {
+		cs.ArchiveOutPath = flagValArchiveOutPath
+	}
+
+	// Scan for GIT Repository.
+	gitRepo := s.scanWithMsg("GIT Repository")
+	if gitRepo != "" {
+		cs.GitRepo = gitRepo
+	}
+
+	// Scan for Passwords
+	fmt.Println("WARN: You will now be prompted for passwords. Those will be hidden, so just keep on typing.")
+
+	// Scan for Archive Password.
+	archivePasswd, err := protectedScan("Password for Archive protection")
+	if err != nil {
+		panic(err)
+	}
+
+	cs.PasswordByte = archivePasswd
+	cs.ProtectArchiveWithPasswd = true
+
+	// Scan if user wants two unique layers of encryption
+	differentPasswd := s.scanWithMsg(
+		"Do you want to chose different password for Encrypting generated Archive Volume(s)? (yes/no, default yes)",
+	)
+	if differentPasswd == "no" {
+		cs.EncryptPassword = archivePasswd
+	} else {
+		// Scan for Encryption Password.
+		encryptionPassword, errPwd := protectedScan("Password for Archive Volume(s) Encryption")
+		if errPwd != nil {
+			panic(errPwd)
+		}
+
+		cs.EncryptPassword = encryptionPassword
+	}
+
+	cs.EncryptPath = archOutPath // TODO: We might want this flexible?
 }

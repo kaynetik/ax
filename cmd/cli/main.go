@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"os"
@@ -23,14 +24,22 @@ const (
 
 func main() {
 	args := os.Args
+	cmdScan := &flags.CmdScan{}
 
 	if len(args) <= 1 {
-		fmt.Println("This will parse the interactive mode! WIP")
+		fmt.Println("You are using AX interactive mode. Prompts that are left blank will use default values.")
+		fmt.Println()
+
+		getScannerFn := func() *bufio.Scanner {
+			return bufio.NewScanner(os.Stdin)
+		}
+
+		cmdScan.ReadUserInput(getScannerFn)
 
 		return
 	}
 
-	cmdScan := flags.ParseAllFlags()
+	cmdScan = flags.ParseAllFlags()
 
 	switch args[oneInt] {
 	case flagCompareHelp:
