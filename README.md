@@ -6,7 +6,7 @@
 
 ![GolangCI](https://github.com/kaynetik/ax/workflows/golangci/badge.svg?branch=main)
 ![Build](https://github.com/kaynetik/ax/workflows/Build/badge.svg?branch=main)
-[![Version](https://img.shields.io/badge/version-v0.0.4-blue.svg)](https://github.com/kaynetik/ax/releases)
+[![Version](https://img.shields.io/badge/version-v0.0.9-purple.svg)](https://github.com/kaynetik/ax/releases)
 
 AX provides the ability to easily create password-protected archives from chosen directory, and apply an additional
 layer of AES encryption once first iteration has been completed. Passwords which are used for Archive protection and AES
@@ -22,7 +22,10 @@ it.
 ## Getting Started
 
 Currently, in active development - should become stable by second week of April '21. Do not use until version badge
-becomes :GREEN: and until adequate testing coverage has been applied.
+becomes :green_heart: until adequate testing coverage has been applied.
+
+Feel free to download preferred version from the [releases page](https://github.com/kaynetik/ax/releases). Most
+operating systems & architectures are supported.
 
 If you wish to use it as a module for your own product, you can
 
@@ -46,6 +49,6 @@ Refer to makefile for examples of CLI usage. Proper examples will be provided be
 1. Add more flexibility to the `PushToGIT` functionality
 2. Add support to `PullFromGIT` & automatically decrypt and extract, given proper credentials were given
 3. ~Add automated release build and generate portable executables~
-   + Fix issue with the build for win executable - can't use `term.ReadPassword`
+    + Fix issue with the build for win executable - can't use `term.ReadPassword`
 4. Cover with unit-tests
 5. Start the GUI wrapper [will be in a separate repo]
