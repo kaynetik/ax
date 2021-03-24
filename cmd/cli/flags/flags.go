@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"syscall"
 
 	"golang.org/x/term"
 )
@@ -133,7 +132,7 @@ func ParseAllFlags() *CmdScan {
 func protectedScan(prompt string) ([]byte, error) {
 	fmt.Printf("\n%s: ", prompt)
 
-	bytePassword, err := term.ReadPassword(syscall.Stdin)
+	bytePassword, err := term.ReadPassword(int(os.Stdin.Fd()))
 	if err != nil {
 		return nil, fmt.Errorf("protected scan failed: %w", err)
 	}

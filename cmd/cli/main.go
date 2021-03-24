@@ -24,13 +24,13 @@ const (
 func main() {
 	args := os.Args
 
-	cmdScan := flags.ParseAllFlags()
-
 	if len(args) <= 1 {
 		fmt.Println("This will parse the interactive mode! WIP")
 
 		return
 	}
+
+	cmdScan := flags.ParseAllFlags()
 
 	switch args[oneInt] {
 	case flagCompareHelp:
