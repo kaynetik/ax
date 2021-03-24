@@ -45,6 +45,7 @@ Refer to makefile for examples of CLI usage. Proper examples will be provided be
 
 1. Add more flexibility to the `PushToGIT` functionality
 2. Add support to `PullFromGIT` & automatically decrypt and extract, given proper credentials were given
-3. Add automated release build and generate portable executables
+3. ~Add automated release build and generate portable executables~
+   + Fix issue with the build for win executable - can't use `term.ReadPassword`
 4. Cover with unit-tests
 5. Start the GUI wrapper [will be in a separate repo]
