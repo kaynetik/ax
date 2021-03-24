@@ -46,6 +46,7 @@ const (
 	promptEnterPasswordForArchiveEncryption = "Enter Password for to protect Archive(s)"
 	promptEnterPasswordForEncryption        = "Enter Password for Archive(s) Encryption"
 	promptEnterPasswordForDecryption        = "Enter Password for Archive(s) Decryption"
+	promptAnswerNo                          = "no"
 )
 
 // CmdScan - represents scanned flags from the stdin.
@@ -194,7 +195,7 @@ func (cs *CmdScan) ReadUserInput(fn getScannerFn) {
 	}
 
 	// Scan for Passwords
-	fmt.Println("WARN: You will now be prompted for passwords. Those will be hidden, so just keep on typing.")
+	fmt.Printf("\n\nWARN: You will now be prompted for passwords. Those will be hidden, so just keep on typing.\n")
 
 	// Scan for Archive Password.
 	archivePasswd, err := protectedScan("Password for Archive protection")
@@ -207,9 +208,9 @@ func (cs *CmdScan) ReadUserInput(fn getScannerFn) {
 
 	// Scan if user wants two unique layers of encryption
 	differentPasswd := s.scanWithMsg(
-		"Do you want to chose different password for Encrypting generated Archive Volume(s)? (yes/no, default yes)",
+		"\nDo you want to chose different password for Encrypting generated Archive Volume(s)? (yes/no, default yes)",
 	)
-	if differentPasswd == "no" {
+	if differentPasswd == promptAnswerNo {
 		cs.EncryptPassword = archivePasswd
 	} else {
 		// Scan for Encryption Password.
@@ -221,5 +222,5 @@ func (cs *CmdScan) ReadUserInput(fn getScannerFn) {
 		cs.EncryptPassword = encryptionPassword
 	}
 
-	cs.EncryptPath = archOutPath // TODO: We might want this flexible?
+	cs.EncryptPath = cs.ArchiveOutPath // TODO: We might want this flexible?
 }

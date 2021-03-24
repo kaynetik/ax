@@ -45,7 +45,7 @@ func PushToGIT(gitRepo string) error {
 		return fmt.Errorf(": %w", err)
 	}
 
-	fmt.Println("added git remote")
+	log.Println("added git remote")
 
 	// commit
 	err = executeCommand(cmdGit, "add .")
@@ -53,14 +53,14 @@ func PushToGIT(gitRepo string) error {
 		return fmt.Errorf(": %w", err)
 	}
 
-	fmt.Println("added all archives to the repo")
+	log.Println("added all archives to the repo")
 
 	err = executeCommand(cmdGit, `commit -m "test_commit_msg"`)
 	if err != nil {
 		return fmt.Errorf(": %w", err)
 	}
 
-	fmt.Println("made a commit")
+	log.Println("made a commit")
 
 	// push
 	err = executeCommand(cmdGit, "push -u origin master --force")
@@ -68,7 +68,7 @@ func PushToGIT(gitRepo string) error {
 		return fmt.Errorf(": %w", err)
 	}
 
-	fmt.Println("pushed commit to remote")
+	log.Println("pushed commit to remote")
 
 	return nil
 }

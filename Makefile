@@ -6,14 +6,16 @@ lint:
 test:
 	go test ./...
 
-build:
-	go build -o ax cmd/cli/main.go
+build-linux:
+	GOOS=linux GOARCH=amd64 go build -o ax cmd/cli/main.go
 
 # Windows build is currently failing due to the usage of term.ReadPassword
 ## cmd/cli/flags/flags.go:136:40: cannot use syscall.Stdin (type syscall.Handle)
 ##   as type int in argument to term.ReadPassword
 build-windows:
 	GOOS=windows GOARCH=amd64 go build -o ax-x86_64.exe cmd/cli/main.go
+
+build: build-linux build-windows
 
 update_cache:
 	curl https://sum.golang.org/lookup/github.com/kaynetik/ax@v$(VER)

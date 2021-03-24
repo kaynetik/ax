@@ -150,8 +150,8 @@ func NewDefaultArchiveConfig() ArchiveConfig {
 	return ArchiveConfig{
 		Password:          []byte(""),
 		ArchiveType:       archiveType,
-		BlockSize:         BlockSizeByte, // TODO: Change to mb before release
-		VolumeSize:        90,
+		BlockSize:         BlockSizeMByte,
+		VolumeSize:        1,
 		FastBytes:         64,
 		DictSize:          64,
 		HeadersEncryption: true,
