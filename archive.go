@@ -12,6 +12,8 @@ const (
 	cmd7z = "7z"
 
 	archiveType = "7z"
+
+	defaultArchiveOutput = "tmp_archive"
 )
 
 var (
@@ -34,38 +36,6 @@ type PathConfig struct {
 
 	// NewArchiveName - if set it will represent the base for the name of output archive(s).
 	NewArchiveName string
-}
-
-// Archive - used to create archive zip volume(s) from a chosen directory.
-func Archive(conf *ArchiveConfig) error {
-	err := validatePathToArchive(conf)
-	if err != nil {
-		return fmt.Errorf("path validation issue: %w", err)
-	}
-
-	err = executeCommand(cmd7z, cmdArgsArchive(conf))
-	if err != nil {
-		return fmt.Errorf("failed executing 7zip: %w", err)
-	}
-
-	return nil
-}
-
-func validatePathToArchive(conf *ArchiveConfig) error {
-	if conf.PathToArchive == "" {
-		return ErrPathEmpty
-	}
-
-	stat, err := os.Stat(conf.PathToArchive)
-	if err != nil {
-		return fmt.Errorf("failed getting path stat: %w", err)
-	}
-
-	if !stat.IsDir() {
-		return ErrNotDir
-	}
-
-	return nil
 }
 
 // ArchiveConfig - represents the config required for the archiving process.
@@ -106,6 +76,38 @@ type ArchiveConfig struct {
 
 	// SolidArchive - default setting '-ms=on'
 	SolidArchive bool
+}
+
+// Archive - used to create archive zip volume(s) from a chosen directory.
+func Archive(conf *ArchiveConfig) error {
+	err := validatePathToArchive(conf)
+	if err != nil {
+		return fmt.Errorf("path validation issue: %w", err)
+	}
+
+	err = executeCommand(cmd7z, cmdArgsArchive(conf))
+	if err != nil {
+		return fmt.Errorf("failed executing 7zip: %w", err)
+	}
+
+	return nil
+}
+
+func validatePathToArchive(conf *ArchiveConfig) error {
+	if conf.PathToArchive == "" {
+		return ErrPathEmpty
+	}
+
+	stat, err := os.Stat(conf.PathToArchive)
+	if err != nil {
+		return fmt.Errorf("failed getting path stat: %w", err)
+	}
+
+	if !stat.IsDir() {
+		return ErrNotDir
+	}
+
+	return nil
 }
 
 // BlockSize - represents size of the volume blocks in b|k|m|g.
@@ -214,7 +216,7 @@ func cmdArgsArchive(ac *ArchiveConfig) string {
 	}
 
 	if ac.OutputPath == "" {
-		ac.OutputPath = "tmp_archive"
+		ac.OutputPath = defaultArchiveOutput
 	}
 
 	if exportArchive.name != "" && exportArchive.typ != "" {
