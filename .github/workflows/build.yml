@@ -23,7 +23,7 @@ jobs:
         env:
           GO111MODULE: off
         run: go get github.com/mattn/goveralls
-#      - name: Send coverage
-#        env:
-#          COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-#        run: goveralls -coverprofile=covprofile
+      - name: Send coverage
+        env:
+          COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+        run: goveralls -coverprofile=covprofile
