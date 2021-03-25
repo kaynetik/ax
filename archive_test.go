@@ -19,10 +19,10 @@ func (s *Suite) TestUnitValidatePath() {
 		{
 			Name: "err empty path",
 			PreRequisites: func() {
-				s.testArchiveConfig = &ArchiveConfig{}
+				s.ac = &ArchiveConfig{}
 			},
 			Assert: func() {
-				err := validatePathToArchive(s.testArchiveConfig)
+				err := validatePathToArchive(s.ac)
 
 				assert.NotNil(s.T(), err)
 				assert.EqualValues(s.T(), ErrPathEmpty, err)
@@ -31,14 +31,14 @@ func (s *Suite) TestUnitValidatePath() {
 		{
 			Name: "err getting filepath stat",
 			PreRequisites: func() {
-				s.testArchiveConfig = &ArchiveConfig{
+				s.ac = &ArchiveConfig{
 					PathConfig: PathConfig{
 						PathToArchive: invalidPath,
 					},
 				}
 			},
 			Assert: func() {
-				err := validatePathToArchive(s.testArchiveConfig)
+				err := validatePathToArchive(s.ac)
 
 				assert.NotNil(s.T(), err)
 			},
@@ -46,14 +46,14 @@ func (s *Suite) TestUnitValidatePath() {
 		{
 			Name: "err file is not of dir type",
 			PreRequisites: func() {
-				s.testArchiveConfig = &ArchiveConfig{
+				s.ac = &ArchiveConfig{
 					PathConfig: PathConfig{
 						PathToArchive: fmt.Sprintf(".%c%s", os.PathSeparator, nameOfArchiveGoSrcFile),
 					},
 				}
 			},
 			Assert: func() {
-				err := validatePathToArchive(s.testArchiveConfig)
+				err := validatePathToArchive(s.ac)
 
 				assert.NotNil(s.T(), err)
 				assert.EqualValues(s.T(), ErrNotDir, err)
@@ -62,14 +62,14 @@ func (s *Suite) TestUnitValidatePath() {
 		{
 			Name: "successful validation of path",
 			PreRequisites: func() {
-				s.testArchiveConfig = &ArchiveConfig{
+				s.ac = &ArchiveConfig{
 					PathConfig: PathConfig{
 						PathToArchive: fmt.Sprintf(".%ccmd", os.PathSeparator),
 					},
 				}
 			},
 			Assert: func() {
-				err := validatePathToArchive(s.testArchiveConfig)
+				err := validatePathToArchive(s.ac)
 
 				assert.Nil(s.T(), err)
 			},
@@ -86,10 +86,10 @@ func (s *Suite) TestUnitArchive() {
 			PreRequisites: func() {
 				// Just triggering one of the cases, given that path validation has been covered
 				//  with TestUnitValidatePath test.
-				s.testArchiveConfig = &ArchiveConfig{}
+				s.ac = &ArchiveConfig{}
 			},
 			Assert: func() {
-				err := Archive(s.testArchiveConfig)
+				err := Archive(s.ac)
 
 				assert.NotNil(s.T(), err)
 			},
@@ -97,14 +97,14 @@ func (s *Suite) TestUnitArchive() {
 		{
 			Name: "successful command execution",
 			PreRequisites: func() {
-				s.testArchiveConfig = &ArchiveConfig{
+				s.ac = &ArchiveConfig{
 					PathConfig: PathConfig{
 						PathToArchive: fmt.Sprintf(".%ccmd", os.PathSeparator),
 					},
 				}
 			},
 			Assert: func() {
-				err := Archive(s.testArchiveConfig)
+				err := Archive(s.ac)
 
 				assert.Nil(s.T(), err)
 			},
@@ -216,18 +216,18 @@ func (s *Suite) TestUnitDefaultConfig() {
 		{
 			Name: "err get default config",
 			PreRequisites: func() {
-				s.testArchiveConfig = &ArchiveConfig{}
+				s.ac = &ArchiveConfig{}
 			},
 			Assert: func() {
 				gotAC := NewDefaultArchiveConfig()
 
-				assert.NotEqualValues(s.T(), s.testArchiveConfig, &gotAC)
+				assert.NotEqualValues(s.T(), s.ac, &gotAC)
 			},
 		},
 		{
 			Name: "success get default config",
 			PreRequisites: func() {
-				s.testArchiveConfig = &ArchiveConfig{
+				s.ac = &ArchiveConfig{
 					Password:          getDefaultPassword(),
 					ArchiveType:       defaultArchiveType,
 					BlockSize:         defaultBlockSize,
@@ -242,7 +242,7 @@ func (s *Suite) TestUnitDefaultConfig() {
 			Assert: func() {
 				gotAC := NewDefaultArchiveConfig()
 
-				assert.EqualValues(s.T(), s.testArchiveConfig, &gotAC)
+				assert.EqualValues(s.T(), s.ac, &gotAC)
 			},
 		},
 	}

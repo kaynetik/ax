@@ -9,8 +9,13 @@ import (
 type Suite struct {
 	suite.Suite
 
-	testArchiveConfig *ArchiveConfig
-	wfBuilder         walkFuncBuilder
+	// ac - reference to ArchiveConfig.
+	ac *ArchiveConfig
+	// ec - reference to ArchiveConfig.
+	ec *ExtractConfig
+
+	// wfBuilder - instance of walkFuncBuilder.
+	wfBuilder walkFuncBuilder
 }
 
 func TestSuite(t *testing.T) {
