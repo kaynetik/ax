@@ -277,7 +277,7 @@ func DefaultPathWalkerFunc(fileList *[]string) filepath.WalkFunc {
 			return fmt.Errorf("walk initiated with an error: %w", err)
 		}
 
-		s, err := os.Stat(path) //TODO: is it worth injecting this func, just for test coverage?
+		s, err := os.Stat(path) // TODO: is it worth injecting this func, just for test coverage?
 		if err != nil {
 			return fmt.Errorf("failed reading path: %s: %w", path, err)
 		}

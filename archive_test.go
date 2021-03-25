@@ -314,7 +314,6 @@ func (s *Suite) TestUnitDefaultPathWalkerFunc() {
 			Name: "err walking path - invalid path",
 			PreRequisites: func() {
 				s.wfBuilder = DefaultPathWalkerFunc
-
 			},
 			Assert: func() {
 				fileList := make([]string, 0)
@@ -329,7 +328,6 @@ func (s *Suite) TestUnitDefaultPathWalkerFunc() {
 			Name: "err walking path - does-not-exist path",
 			PreRequisites: func() {
 				s.wfBuilder = DefaultPathWalkerFunc
-
 			},
 			Assert: func() {
 				fileList := make([]string, 0)
