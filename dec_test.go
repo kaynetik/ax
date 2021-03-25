@@ -2,30 +2,30 @@ package ax
 
 import (
 	"crypto/sha256"
-	"io"
-	"os"
-	"testing"
-
 	"github.com/stretchr/testify/assert"
+	"os"
 )
 
-const (
-	test7z001      = ".7z.001"
-	encFileNameOut = testArchiveNewName + test7z001 + ".1"
-)
+const decFileNameOut = testArchiveNewName + test7z001
 
-func (s *Suite) TestUnitFileEncrypt() {
+func (s *Suite) TestUnitFileDecrypt() {
 	testCases := []TestCase{
 		{
-			Name: "full file encryption",
+			Name: "full file decryption",
 			Assert: func() {
+				// Generate encrypted file.
 				outDir := "./tests/lorem_data_out/"
 				fileIn := outDir + testArchiveNewName + test7z001
 				pwdKey := sha256.Sum256([]byte("defaultPwdKey"))
 
 				FileEncryption(pwdKey[:], fileIn, outDir+encFileNameOut)
 
+				// Execute the func being tested.
+				FileDecryption(pwdKey[:], outDir+encFileNameOut, outDir+decFileNameOut)
+
+				// Assert.
 				assert.FileExists(s.T(), outDir+encFileNameOut)
+				_ = os.Remove(outDir + encFileNameOut)
 			},
 		},
 	}
@@ -33,10 +33,10 @@ func (s *Suite) TestUnitFileEncrypt() {
 	RunTestCases(s, testCases)
 }
 
-func (s *Suite) TestUnitDefaultEncryption() {
+func (s *Suite) TestUnitDefaultDecryption() {
 	testCases := []TestCase{
 		{
-			Name: "default encryption - with cleanup",
+			Name: "default decryption - with cleanup",
 			Assert: func() {
 				pwdKey := []byte("defaultPwdKey")
 				// Setup dir structure.
@@ -49,14 +49,20 @@ func (s *Suite) TestUnitDefaultEncryption() {
 				// Get listing of the temporary out path.
 				fl, err := ListFiles(outFilePath, DefaultPathWalkerFunc)
 				assert.Nil(s.T(), err)
+				err = DefaultFileEncryption(pwdKey, fl)
+				assert.Nil(s.T(), err)
+
+				// Get listing of the temporary out path.
+				fl, err = ListFiles(outFilePath, DefaultPathWalkerFunc)
+				assert.Nil(s.T(), err)
 
 				// Execute the func being tested.
-				err = DefaultFileEncryption(pwdKey, fl)
+				err = DefaultFileDecryption(pwdKey, fl)
 
 				// Assert.
 				assert.Nil(s.T(), err)
 				assert.GreaterOrEqual(s.T(), len(fl), 1)
-				assert.FileExists(s.T(), outFile+".enc.0")
+				assert.FileExists(s.T(), outFile)
 
 				// Cleanup.
 				err = os.RemoveAll(outFilePath)
@@ -68,25 +74,4 @@ func (s *Suite) TestUnitDefaultEncryption() {
 	}
 
 	RunTestCases(s, testCases)
-}
-
-func copyFileToEnc(t *testing.T, inFilePath, outFilePath string) {
-	t.Helper()
-
-	from, err := os.Open(inFilePath)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer from.Close()
-
-	to, err := os.OpenFile(outFilePath, os.O_RDWR|os.O_CREATE, 0o666)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer to.Close()
-
-	_, err = io.Copy(to, from)
-	if err != nil {
-		t.Fatal(err)
-	}
 }
