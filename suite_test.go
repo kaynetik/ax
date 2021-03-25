@@ -1,8 +1,9 @@
 package ax
 
 import (
-	"github.com/stretchr/testify/suite"
 	"testing"
+
+	"github.com/stretchr/testify/suite"
 )
 
 type Suite struct {
@@ -12,5 +13,7 @@ type Suite struct {
 }
 
 func TestSuite(t *testing.T) {
+	t.Parallel()
+
 	suite.Run(t, new(Suite))
 }

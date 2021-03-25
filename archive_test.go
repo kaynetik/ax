@@ -2,8 +2,9 @@ package ax
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"os"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const nameOfArchiveGoSrcFile = "archive.go"
@@ -32,7 +33,6 @@ func (s *Suite) TestUnitValidatePath() {
 				}
 			},
 			Assert: func() {
-
 				err := validatePathToArchive(s.testArchiveConfig)
 
 				assert.NotNil(s.T(), err)
@@ -48,7 +48,6 @@ func (s *Suite) TestUnitValidatePath() {
 				}
 			},
 			Assert: func() {
-
 				err := validatePathToArchive(s.testArchiveConfig)
 
 				assert.NotNil(s.T(), err)
@@ -65,7 +64,6 @@ func (s *Suite) TestUnitValidatePath() {
 				}
 			},
 			Assert: func() {
-
 				err := validatePathToArchive(s.testArchiveConfig)
 
 				assert.Nil(s.T(), err)
@@ -149,7 +147,6 @@ func (s *Suite) TestUnitDetermineBlockSize() {
 
 					assert.EqualValues(s.T(), c.expectedBS, gotBS)
 				}
-
 			},
 		},
 	}

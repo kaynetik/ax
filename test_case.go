@@ -1,5 +1,6 @@
 package ax
 
+// TestCase - base case struct used in testing Suite.
 type TestCase struct {
 	Name          string
 	PreRequisites func()
@@ -8,10 +9,12 @@ type TestCase struct {
 	SubTests []TestCase
 }
 
+// SuiteRunner - interface for running testing Suite.
 type SuiteRunner interface {
 	Run(name string, subtest func()) bool
 }
 
+// RunTestCases - func executing the passed testing Suite.
 func RunTestCases(s SuiteRunner, testCases []TestCase) {
 	if len(testCases) == 0 {
 		return
