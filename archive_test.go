@@ -115,10 +115,9 @@ func (s *Suite) TestUnitDetermineBlockSize() {
 	testCases := []TestCase{
 		{
 			Name: "success convert all cases",
-
 			Assert: func() {
-				// Exception to the general rule - it is acceptable that this assert iterates over few cases,
-				// given that they don't have an returning error, but are just casting letters to the BlockSize type.
+				const randomDefaultVal = "defaultVal"
+
 				cases := []struct {
 					blockSizeStr string
 					expectedBS   BlockSize
@@ -140,7 +139,7 @@ func (s *Suite) TestUnitDetermineBlockSize() {
 						BlockSizeGB,
 					},
 					{
-						"defaultValMB",
+						randomDefaultVal,
 						defaultBlockSize,
 					},
 				}
@@ -151,6 +150,43 @@ func (s *Suite) TestUnitDetermineBlockSize() {
 					assert.EqualValues(s.T(), c.expectedBS, gotBS)
 				}
 
+			},
+		},
+	}
+
+	RunTestCases(s, testCases)
+}
+
+func (s *Suite) TestUnitBlockSizeStringReturn() {
+	testCases := []TestCase{
+		{
+			Name: "success stringer interface on BlockSize",
+			Assert: func() {
+				cases := []struct {
+					bsExpectedStr string
+					bs            BlockSize
+				}{
+					{
+						letterB,
+						BlockSizeByte,
+					},
+					{
+						letterK,
+						BlockSizeKB,
+					},
+					{
+						letterM,
+						BlockSizeMB,
+					},
+					{
+						letterG,
+						BlockSizeGB,
+					},
+				}
+
+				for _, c := range cases {
+					assert.EqualValues(s.T(), c.bsExpectedStr, c.bs.String())
+				}
 			},
 		},
 	}
