@@ -10,6 +10,7 @@ type Suite struct {
 	suite.Suite
 
 	testArchiveConfig *ArchiveConfig
+	wfBuilder         walkFuncBuilder
 }
 
 func TestSuite(t *testing.T) {

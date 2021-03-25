@@ -1,8 +1,10 @@
 package ax
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -209,6 +211,17 @@ func (s *Suite) TestUnitGetDefaultPasswordByte() {
 func (s *Suite) TestUnitDefaultConfig() {
 	testCases := []TestCase{
 		{
+			Name: "err get default config",
+			PreRequisites: func() {
+				s.testArchiveConfig = &ArchiveConfig{}
+			},
+			Assert: func() {
+				gotAC := NewDefaultArchiveConfig()
+
+				assert.NotEqualValues(s.T(), s.testArchiveConfig, &gotAC)
+			},
+		},
+		{
 			Name: "success get default config",
 			PreRequisites: func() {
 				s.testArchiveConfig = &ArchiveConfig{
@@ -227,6 +240,49 @@ func (s *Suite) TestUnitDefaultConfig() {
 				gotAC := NewDefaultArchiveConfig()
 
 				assert.EqualValues(s.T(), s.testArchiveConfig, &gotAC)
+			},
+		},
+	}
+
+	RunTestCases(s, testCases)
+}
+
+func (s *Suite) TestUnitListFiles() {
+	testCases := []TestCase{
+		{
+			Name: "err walking path",
+			PreRequisites: func() {
+				s.wfBuilder = func(fl *[]string) filepath.WalkFunc {
+					return func(path string, f os.FileInfo, err error) error {
+						return errors.New("triggered filepath.WalkFunc err")
+					}
+				}
+			},
+			Assert: func() {
+				listOfDotPath := fmt.Sprintf(".%c", os.PathSeparator)
+				gotFileList, err := ListFiles(listOfDotPath, s.wfBuilder)
+
+				assert.NotNil(s.T(), err)
+				assert.Equal(s.T(), 0, len(gotFileList))
+			},
+		},
+		{
+			// Note: Here we are testing just the handling within ListFiles func.
+			// The actual success filepath.WalkFunc case is covered in the TestUnitDefaultPathWalkerFunc.
+			Name: "success walking path",
+			PreRequisites: func() {
+				s.wfBuilder = func(fl *[]string) filepath.WalkFunc {
+					return func(path string, f os.FileInfo, err error) error {
+						return nil
+					}
+				}
+			},
+			Assert: func() {
+				listOfDotPath := fmt.Sprintf(".%c", os.PathSeparator)
+				gotFileList, err := ListFiles(listOfDotPath, s.wfBuilder)
+
+				assert.Nil(s.T(), err)
+				assert.Equal(s.T(), 0, len(gotFileList))
 			},
 		},
 	}

@@ -63,7 +63,7 @@ func main() {
 
 		return
 	case flagCompareEncryptIn:
-		fileList, err := ax.ListFiles(cmdScan.EncryptPath)
+		fileList, err := ax.ListFiles(cmdScan.EncryptPath, ax.DefaultPathWalkerFunc)
 		if err != nil {
 			panic(err)
 		}
@@ -75,7 +75,7 @@ func main() {
 
 		return
 	case flagCompareDecryptIn:
-		fileList, err := ax.ListFiles(cmdScan.DecryptPath)
+		fileList, err := ax.ListFiles(cmdScan.DecryptPath, ax.DefaultPathWalkerFunc)
 		if err != nil {
 			panic(err)
 		}
@@ -109,7 +109,7 @@ func archiveEncryptAndPushToGit(cs *flags.CmdScan) {
 	}
 
 	// Encrypt
-	fileList, err := ax.ListFiles(cs.EncryptPath)
+	fileList, err := ax.ListFiles(cs.EncryptPath, ax.DefaultPathWalkerFunc)
 	if err != nil {
 		panic(err)
 	}

@@ -255,10 +255,26 @@ func appendToString(command *string, flag string) {
 }
 
 // ListFiles - used to list files, without directories in a chosen path.
-func ListFiles(pathToWalk string) ([]string, error) {
-	var fileList []string
+func ListFiles(pathToWalk string, walkFuncBuilder walkFuncBuilder) ([]string, error) {
+	fileList := make([]string, 0)
 
-	err := filepath.Walk(pathToWalk, func(path string, f os.FileInfo, err error) error {
+	pathWalkerFn := walkFuncBuilder(&fileList)
+
+	err := filepath.Walk(pathToWalk, pathWalkerFn)
+	if err != nil {
+		return fileList, fmt.Errorf("failed walking path: %s with error: %w", pathToWalk, err)
+	}
+
+	return fileList, nil
+}
+
+type walkFuncBuilder func(fileList *[]string) filepath.WalkFunc
+
+// DefaultPathWalkerFunc - returns default implementation of filepath.WalkFunc.
+//
+// This approach enables the flexibility to override the filepath.WalkFunc used by our ListFiles func.
+func DefaultPathWalkerFunc(fileList *[]string) filepath.WalkFunc {
+	return func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return fmt.Errorf("walk initiated with an error: %w", err)
 		}
@@ -269,14 +285,9 @@ func ListFiles(pathToWalk string) ([]string, error) {
 		}
 
 		if !s.IsDir() && !strings.Contains(path, "/.git/") {
-			fileList = append(fileList, path)
+			*fileList = append(*fileList, path)
 		}
 
 		return nil
-	})
-	if err != nil {
-		return fileList, fmt.Errorf("failed walking path: %s with error: %w", pathToWalk, err)
 	}
-
-	return fileList, nil
 }
