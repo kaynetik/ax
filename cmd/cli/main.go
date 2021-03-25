@@ -6,9 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kaynetik/ax/cmd/cli/flags"
-
 	"github.com/kaynetik/ax"
+	"github.com/kaynetik/ax/pkg/cli/flags"
 )
 
 const (
