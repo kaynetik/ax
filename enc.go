@@ -39,7 +39,8 @@ func FileEncryption(bytKey []byte, inFileName, encFileName string) {
 
 	writer := &cipher.StreamWriter{S: stream, W: outFile}
 
-	if _, err = io.Copy(writer, inFile); err != nil {
+	_, err = io.Copy(writer, inFile)
+	if err != nil {
 		panic(err)
 	}
 }
