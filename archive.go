@@ -148,24 +148,36 @@ const (
 
 	// BlockSizeGB - GB representative character.
 	BlockSizeGB = BlockSize(letterG)
-
-	defaultBlockSize = BlockSizeMB
 )
+
+const (
+	defaultArchiveType      = archiveType
+	defaultBlockSize        = BlockSizeMB
+	defaultVolumeSize       = uint64(90)
+	defaultFastBytes        = uint16(64)
+	defaultDictSize         = uint16(64)
+	defaultHeadersEnc       = true
+	defaultCompressionLevel = uint8(9)
+	defaultSolidArchive     = true
+	defaultPasswordStr      = ""
+)
+
+func getDefaultPassword() []byte { return []byte(defaultPasswordStr) }
 
 // NewDefaultArchiveConfig - returns ArchiveConfig with default values pre-set.
 //
 // Note that default setting is 'Ultra' (highest compression).
 func NewDefaultArchiveConfig() ArchiveConfig {
 	return ArchiveConfig{
-		Password:          []byte(""),
-		ArchiveType:       archiveType,
+		Password:          getDefaultPassword(),
+		ArchiveType:       defaultArchiveType,
 		BlockSize:         defaultBlockSize,
-		VolumeSize:        1,
-		FastBytes:         64,
-		DictSize:          64,
-		HeadersEncryption: true,
-		Compression:       9,
-		SolidArchive:      true,
+		VolumeSize:        defaultVolumeSize,
+		FastBytes:         defaultFastBytes,
+		DictSize:          defaultDictSize,
+		HeadersEncryption: defaultHeadersEnc,
+		Compression:       defaultCompressionLevel,
+		SolidArchive:      defaultSolidArchive,
 	}
 }
 

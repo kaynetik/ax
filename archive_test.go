@@ -193,3 +193,46 @@ func (s *Suite) TestUnitBlockSizeStringReturn() {
 
 	RunTestCases(s, testCases)
 }
+
+func (s *Suite) TestUnitGetDefaultPasswordByte() {
+	testCases := []TestCase{
+		{
+			Name: "success get default password",
+			Assert: func() {
+				got := getDefaultPassword()
+
+				assert.EqualValues(s.T(), []byte(defaultPasswordStr), got)
+			},
+		},
+	}
+
+	RunTestCases(s, testCases)
+}
+
+func (s *Suite) TestUnitDefaultConfig() {
+	testCases := []TestCase{
+		{
+			Name: "success get default config",
+			PreRequisites: func() {
+				s.testArchiveConfig = &ArchiveConfig{
+					Password:          getDefaultPassword(),
+					ArchiveType:       defaultArchiveType,
+					BlockSize:         defaultBlockSize,
+					VolumeSize:        defaultVolumeSize,
+					FastBytes:         defaultFastBytes,
+					DictSize:          defaultDictSize,
+					HeadersEncryption: defaultHeadersEnc,
+					Compression:       defaultCompressionLevel,
+					SolidArchive:      defaultSolidArchive,
+				}
+			},
+			Assert: func() {
+				gotAC := NewDefaultArchiveConfig()
+
+				assert.EqualValues(s.T(), s.testArchiveConfig, &gotAC)
+			},
+		},
+	}
+
+	RunTestCases(s, testCases)
+}
