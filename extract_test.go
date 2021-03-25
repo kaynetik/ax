@@ -1,9 +1,18 @@
 package ax
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/stretchr/testify/assert"
+)
+
+const (
+	testDirLoremIn     = "lorem_data_in"
+	testLoremFileName  = "lorem.md"
+	testPathToArchive  = "." + string(os.PathSeparator) + "tests" + string(os.PathSeparator) + testDirLoremIn
+	testPathArchiveOut = "./tests/lorem_data_out"
+	testArchiveNewName = "test_new_name"
 )
 
 func (s *Suite) TestUnitExtract() {
@@ -23,9 +32,9 @@ func (s *Suite) TestUnitExtract() {
 			Name: "success extracting",
 			PreRequisites: func() {
 				ac := NewDefaultArchiveConfig()
-				ac.PathToArchive = "../tmp_to_archive"
-				ac.OutputPath = "../tmp_archive_out"
-				ac.NewArchiveName = "test_archive"
+				ac.PathToArchive = testPathToArchive
+				ac.OutputPath = testPathArchiveOut
+				ac.NewArchiveName = testArchiveNewName
 				s.ac = &ac
 
 				_ = os.RemoveAll(s.ac.OutputPath)
@@ -42,8 +51,11 @@ func (s *Suite) TestUnitExtract() {
 			},
 			Assert: func() {
 				err := Extract(s.ec)
+				expectedFileExistence := fmt.Sprintf("%s%c%s%c%s",
+					testPathArchiveOut, os.PathSeparator, testDirLoremIn, os.PathSeparator, testLoremFileName)
 
 				assert.Nil(s.T(), err)
+				assert.FileExists(s.T(), expectedFileExistence)
 			},
 		},
 	}
