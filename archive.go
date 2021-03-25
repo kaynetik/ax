@@ -53,7 +53,7 @@ type ArchiveConfig struct {
 	// ArchiveType - default setting '-t7z'.
 	ArchiveType string
 
-	// BlockSize - default setting 'm' [BlockSizeMByte].
+	// BlockSize - default setting 'm' [BlockSizeMB].
 	BlockSize BlockSize // b,k,m,g - size representation
 
 	// VolumeSize - default setting '-v9m' - representing volumes of 9Megabytes each.
@@ -120,29 +120,36 @@ func (v *BlockSize) String() string {
 // DetermineBlockSize - returns BlockSize casted from an input string.
 func DetermineBlockSize(bs string) BlockSize {
 	switch bs {
-	case "b":
+	case letterB:
 		return BlockSizeByte
-	case "k":
-		return BlockSizeKByte
-	case "g":
-		return BlockSizeGByte
+	case letterK:
+		return BlockSizeKB
+	case letterG:
+		return BlockSizeGB
 	default:
-		return BlockSizeMByte
+		return defaultBlockSize
 	}
 }
 
 const (
+	letterB = "b"
+	letterK = "k"
+	letterM = "m"
+	letterG = "g"
+
 	// BlockSizeByte - Byte representative character.
-	BlockSizeByte = BlockSize("b")
+	BlockSizeByte = BlockSize(letterB)
 
-	// BlockSizeKByte - KiloByte representative character.
-	BlockSizeKByte = BlockSize("k")
+	// BlockSizeKB - KB representative character.
+	BlockSizeKB = BlockSize(letterK)
 
-	// BlockSizeMByte - MegaByte representative character.
-	BlockSizeMByte = BlockSize("m")
+	// BlockSizeMB - MB representative character.
+	BlockSizeMB = BlockSize(letterM)
 
-	// BlockSizeGByte - GigaByte representative character.
-	BlockSizeGByte = BlockSize("g")
+	// BlockSizeGB - GB representative character.
+	BlockSizeGB = BlockSize(letterG)
+
+	defaultBlockSize = BlockSizeMB
 )
 
 // NewDefaultArchiveConfig - returns ArchiveConfig with default values pre-set.
@@ -152,7 +159,7 @@ func NewDefaultArchiveConfig() ArchiveConfig {
 	return ArchiveConfig{
 		Password:          []byte(""),
 		ArchiveType:       archiveType,
-		BlockSize:         BlockSizeMByte,
+		BlockSize:         defaultBlockSize,
 		VolumeSize:        1,
 		FastBytes:         64,
 		DictSize:          64,
@@ -199,7 +206,7 @@ func cmdArgsArchive(ac *ArchiveConfig) string {
 
 	if ac.VolumeSize != 0 {
 		if ac.BlockSize == "" {
-			ac.BlockSize = BlockSizeMByte
+			ac.BlockSize = BlockSizeMB
 		}
 
 		appendToString(&cmdStr, fmt.Sprintf("-v%d%s", ac.VolumeSize, ac.BlockSize))

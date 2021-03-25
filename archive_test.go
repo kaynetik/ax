@@ -111,19 +111,49 @@ func (s *Suite) TestUnitArchive() {
 	RunTestCases(s, testCases)
 }
 
-//func (s *Suite) TestUnitDetermineBlockSize() {
-//	testCases := []TestCase{
-//		{
-//			Name: "success convert all cases",
-//
-//			Assert: func() {
-//				validCases := strings.Split()
-//				err := Archive(s.testArchiveConfig)
-//
-//				assert.NotNil(s.T(), err)
-//			},
-//		},
-//	}
-//
-//	RunTestCases(s, testCases)
-//}
+func (s *Suite) TestUnitDetermineBlockSize() {
+	testCases := []TestCase{
+		{
+			Name: "success convert all cases",
+
+			Assert: func() {
+				// Exception to the general rule - it is acceptable that this assert iterates over few cases,
+				// given that they don't have an returning error, but are just casting letters to the BlockSize type.
+				cases := []struct {
+					blockSizeStr string
+					expectedBS   BlockSize
+				}{
+					{
+						letterB,
+						BlockSizeByte,
+					},
+					{
+						letterK,
+						BlockSizeKB,
+					},
+					{
+						letterM,
+						BlockSizeMB,
+					},
+					{
+						letterG,
+						BlockSizeGB,
+					},
+					{
+						"defaultValMB",
+						defaultBlockSize,
+					},
+				}
+
+				for _, c := range cases {
+					gotBS := DetermineBlockSize(c.blockSizeStr)
+
+					assert.EqualValues(s.T(), c.expectedBS, gotBS)
+				}
+
+			},
+		},
+	}
+
+	RunTestCases(s, testCases)
+}
