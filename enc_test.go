@@ -2,19 +2,16 @@ package ax
 
 import (
 	"crypto/sha256"
-	"fmt"
-	"github.com/stretchr/testify/assert"
 	"io"
-	"log"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const (
-	osPS               = os.PathSeparator
-	test7z001          = ".7z.001"
-	encFileNameOut     = testArchiveNewName + test7z001 + ".1"
-	testPathDefaultEnc = "./tests/lorem_enc"
+	test7z001      = ".7z.001"
+	encFileNameOut = testArchiveNewName + test7z001 + ".1"
 )
 
 func (s *Suite) TestUnitEncrypt() {
@@ -22,7 +19,7 @@ func (s *Suite) TestUnitEncrypt() {
 		{
 			Name: "full file encryption",
 			Assert: func() {
-				outDir := fmt.Sprintf("%s%c", testPathArchiveOut, os.PathSeparator)
+				outDir := "./tests/lorem_data_out/"
 				fileIn := outDir + testArchiveNewName + test7z001
 				pwdKey := sha256.Sum256([]byte("defaultPwdKey"))
 
@@ -41,6 +38,7 @@ func (s *Suite) TestUnitDefaultEncryption() {
 		{
 			Name: "default encryption - with cleanup",
 			Assert: func() {
+				pwdKey := []byte("defaultPwdKey")
 				// Setup dir structure.
 				inFilePath := "./tests/lorem_data_in/lorem.md"
 				outFilePath := "./tests/lorem_enc"
@@ -50,7 +48,7 @@ func (s *Suite) TestUnitDefaultEncryption() {
 
 				// Get listing of the temporary out path.
 				fl, err := ListFiles(outFilePath, DefaultPathWalkerFunc)
-				pwdKey := []byte("defaultPwdKey")
+				assert.Nil(s.T(), err)
 
 				// Execute the func being tested.
 				err = DefaultFileEncryption(pwdKey, fl)
@@ -77,18 +75,18 @@ func copyFileToEnc(t *testing.T, inFilePath, outFilePath string) {
 
 	from, err := os.Open(inFilePath)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer from.Close()
 
-	to, err := os.OpenFile(outFilePath, os.O_RDWR|os.O_CREATE, 0666)
+	to, err := os.OpenFile(outFilePath, os.O_RDWR|os.O_CREATE, 0o666)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer to.Close()
 
 	_, err = io.Copy(to, from)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 }
