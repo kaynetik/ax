@@ -9,7 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const nameOfArchiveGoSrcFile = "archive.go"
+const (
+	nameOfArchiveGoSrcFile = "archive.go"
+	invalidPath            = "./invalid\\on_each\\/os"
+)
 
 func (s *Suite) TestUnitValidatePath() {
 	testCases := []TestCase{
@@ -30,7 +33,7 @@ func (s *Suite) TestUnitValidatePath() {
 			PreRequisites: func() {
 				s.testArchiveConfig = &ArchiveConfig{
 					PathConfig: PathConfig{
-						PathToArchive: "./invalid\\on_each\\/os",
+						PathToArchive: invalidPath,
 					},
 				}
 			},
@@ -259,8 +262,8 @@ func (s *Suite) TestUnitListFiles() {
 				}
 			},
 			Assert: func() {
-				listOfDotPath := fmt.Sprintf(".%c", os.PathSeparator)
-				gotFileList, err := ListFiles(listOfDotPath, s.wfBuilder)
+				dotPath := fmt.Sprintf(".%c", os.PathSeparator)
+				gotFileList, err := ListFiles(dotPath, s.wfBuilder)
 
 				assert.NotNil(s.T(), err)
 				assert.Equal(s.T(), 0, len(gotFileList))
@@ -278,11 +281,63 @@ func (s *Suite) TestUnitListFiles() {
 				}
 			},
 			Assert: func() {
-				listOfDotPath := fmt.Sprintf(".%c", os.PathSeparator)
-				gotFileList, err := ListFiles(listOfDotPath, s.wfBuilder)
+				dotPath := fmt.Sprintf(".%c", os.PathSeparator)
+				gotFileList, err := ListFiles(dotPath, s.wfBuilder)
 
 				assert.Nil(s.T(), err)
 				assert.Equal(s.T(), 0, len(gotFileList))
+			},
+		},
+	}
+
+	RunTestCases(s, testCases)
+}
+
+func (s *Suite) TestUnitDefaultPathWalkerFunc() {
+	testCases := []TestCase{
+		{
+			Name: "success walking path",
+			PreRequisites: func() {
+				s.wfBuilder = DefaultPathWalkerFunc
+			},
+			Assert: func() {
+				dotPath := fmt.Sprintf(".%c", os.PathSeparator)
+				fileList := make([]string, 0)
+
+				err := filepath.Walk(dotPath, s.wfBuilder(&fileList))
+
+				assert.Nil(s.T(), err)
+				assert.GreaterOrEqual(s.T(), len(fileList), 10)
+			},
+		},
+		{
+			Name: "err walking path - invalid path",
+			PreRequisites: func() {
+				s.wfBuilder = DefaultPathWalkerFunc
+
+			},
+			Assert: func() {
+				fileList := make([]string, 0)
+
+				err := filepath.Walk(invalidPath, s.wfBuilder(&fileList))
+
+				assert.NotNil(s.T(), err)
+				assert.Equal(s.T(), 0, len(fileList))
+			},
+		},
+		{
+			Name: "err walking path - does-not-exist path",
+			PreRequisites: func() {
+				s.wfBuilder = DefaultPathWalkerFunc
+
+			},
+			Assert: func() {
+				fileList := make([]string, 0)
+
+				err := filepath.Walk("does-not-exist", s.wfBuilder(&fileList))
+
+				assert.NotNil(s.T(), err)
+				assert.Equal(s.T(), 0, len(fileList))
 			},
 		},
 	}

@@ -9,10 +9,8 @@ import (
 )
 
 const (
-	cmd7z = "7z"
-
-	archiveType = "7z"
-
+	cmd7z                = "7z"
+	archiveType          = "7z"
 	defaultArchiveOutput = "tmp_archive"
 )
 
@@ -279,12 +277,12 @@ func DefaultPathWalkerFunc(fileList *[]string) filepath.WalkFunc {
 			return fmt.Errorf("walk initiated with an error: %w", err)
 		}
 
-		s, err := os.Stat(path)
+		s, err := os.Stat(path) //TODO: is it worth injecting this func, just for test coverage?
 		if err != nil {
 			return fmt.Errorf("failed reading path: %s: %w", path, err)
 		}
 
-		if !s.IsDir() && !strings.Contains(path, "/.git/") {
+		if !s.IsDir() && !strings.Contains(path, ".git/") {
 			*fileList = append(*fileList, path)
 		}
 
