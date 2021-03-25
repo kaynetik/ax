@@ -2,8 +2,9 @@ package ax
 
 import (
 	"crypto/sha256"
-	"github.com/stretchr/testify/assert"
 	"os"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const decFileNameOut = testArchiveNewName + test7z001
