@@ -40,11 +40,10 @@ func (s *Suite) TestUnitDefaultEncryption() {
 			Assert: func() {
 				pwdKey := []byte("defaultPwdKey")
 				// Setup dir structure.
-				inFilePath := "./tests/lorem_data_in/lorem.md"
 				outFilePath := "./tests/lorem_enc"
 				outFile := outFilePath + "/lorem.md"
 				_ = os.Mkdir(outFilePath, os.ModePerm)
-				copyFileToEnc(s.T(), inFilePath, outFile)
+				copyFileToEnc(s.T(), testLoremInFile, outFile)
 
 				// Get listing of the temporary out path.
 				fl, err := ListFiles(outFilePath, DefaultPathWalkerFunc)

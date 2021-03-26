@@ -94,7 +94,7 @@ func ParseAllFlags() *CmdScan {
 
 // protectedScan - used to read password from stdin. Input is being hidden while typing.
 func protectedScan(prompt string) ([]byte, error) {
-	fmt.Printf("\n%s: ", prompt)
+	printStdoutLn(fmt.Sprintf("\n%s: ", prompt))
 
 	bytePassword, err := term.ReadPassword(int(os.Stdin.Fd()))
 	if err != nil {
@@ -119,7 +119,7 @@ func newScanner(io *bufio.Scanner) scanner {
 
 // scanWithMsg - prompts the user for input, with the provided message (prompt).
 func (s *scanner) scanWithMsg(prompt string) string {
-	fmt.Printf("\n%s: ", prompt)
+	printStdoutLn(fmt.Sprintf("%s: ", prompt))
 	s.ioScanner.Scan()
 
 	return s.ioScanner.Text()
@@ -157,7 +157,7 @@ func (cs *CmdScan) ReadUserInput(fn getScannerFn) {
 	}
 
 	// Scan for Passwords
-	fmt.Printf("\n\nWARN: You will now be prompted for passwords. Those will be hidden, so just keep on typing.\n")
+	printStdoutLn("\nWARN: You will now be prompted for passwords. Those will be hidden, so just keep on typing.")
 
 	// Scan for Archive Password.
 	archivePasswd, err := protectedScan("Password for Archive protection")
@@ -185,4 +185,8 @@ func (cs *CmdScan) ReadUserInput(fn getScannerFn) {
 	}
 
 	cs.EncryptPath = cs.ArchiveOutPath // TODO: We might want this flexible?
+}
+
+func printStdoutLn(args ...interface{}) {
+	_, _ = fmt.Fprintln(os.Stdout, args...)
 }

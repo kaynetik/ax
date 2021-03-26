@@ -57,7 +57,7 @@ func DefaultFileDecryption(passwd []byte, fileList []string) error {
 		}
 	}
 
-	fmt.Println("Archives Decrypted!")
+	printStdoutLn("Archives Decrypted!")
 
 	return nil
 }

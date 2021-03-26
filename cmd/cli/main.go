@@ -130,7 +130,7 @@ func archiveEncryptAndPushToGit(cs *flags.CmdScan) {
 		panic(err)
 	}
 
-	fmt.Println("Pushed to GIT! Your Archive(s) have been backed up!")
+	printStdoutLn("Pushed to GIT! Your Archive(s) have been backed up!")
 }
 
 func archive(conf *ax.ArchiveConfig) error {
@@ -139,7 +139,7 @@ func archive(conf *ax.ArchiveConfig) error {
 		return fmt.Errorf("an issue occurred while archiving: %w", err)
 	}
 
-	fmt.Println("Finished Archiving!")
+	printStdoutLn("Finished Archiving!")
 
 	return nil
 }
@@ -161,7 +161,7 @@ func extract(conf *ax.ExtractConfig) error {
 		return fmt.Errorf("an issue occurred while etxtacting archive(s): %w", err)
 	}
 
-	fmt.Println("Finished Extracting!")
+	printStdoutLn("Finished Extracting!")
 
 	return nil
 }
@@ -175,17 +175,23 @@ func prepareConfigForExtracting(scannedFlags *flags.CmdScan) *ax.ExtractConfig {
 	return &ec
 }
 
+func printStdoutLn(args ...interface{}) {
+	_, _ = fmt.Fprintln(os.Stdout, args...)
+}
+
 func printHelp() {
-	fmt.Printf("TODO: Additional info about the crypto CLI implementation.\n\n")
-	fmt.Printf("When called without any arguments/flags, interactive mode will be initated.\n")
-	fmt.Printf("When called with arguments/flags, those that are left out will assume their default required values.\n\n")
+	printStdoutLn("TODO: Additional info about the crypto CLI implementation.\n\n")
+	printStdoutLn("When called without any arguments/flags, interactive mode will be initated.\n")
+	printStdoutLn(
+		"When called with arguments/flags, those that are left out will assume their default required values.\n\n",
+	)
 }
 
 func printInteractiveModeHelp() {
-	fmt.Printf("You are using AX interactive mode. Prompts that are left blank will use default values.\n")
-	fmt.Printf("Currently we support only GIT Push via ssh: git@github.com:{USER}/{REPOSITORY}.git\n")
-	fmt.Println("\nChoose which action do you want to preform:")
-	fmt.Println("\n1. Archive, Encrypt & Push to GIT Repo")
-	fmt.Println("\n2. .... TBD - This is Work in Progress")
-	fmt.Println("\n\nNote: Defaulting to option number 1, as others aren't supported yet!")
+	printStdoutLn("You are using AX interactive mode. Prompts that are left blank will use default values.\n")
+	printStdoutLn("Currently we support only GIT Push via ssh: git@github.com:{USER}/{REPOSITORY}.git\n")
+	printStdoutLn("\nChoose which action do you want to preform:")
+	printStdoutLn("\n1. Archive, Encrypt & Push to GIT Repo")
+	printStdoutLn("\n2. .... TBD - This is Work in Progress")
+	printStdoutLn("\n\nNote: Defaulting to option number 1, as others aren't supported yet!")
 }

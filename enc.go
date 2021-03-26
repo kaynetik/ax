@@ -58,7 +58,7 @@ func DefaultFileEncryption(passwd []byte, fileList []string) error {
 		}
 	}
 
-	fmt.Println("\nArchive(s) encrypted!")
+	printStdoutLn("\nArchive(s) encrypted!")
 
 	return nil
 }

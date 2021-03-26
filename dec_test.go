@@ -7,7 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const decFileNameOut = testArchiveNewName + test7z001
+const (
+	decFileNameOut  = testArchiveNewName + test7z001
+	testLoremInFile = "./tests/lorem_data_in/lorem.md"
+)
 
 func (s *Suite) TestUnitFileDecrypt() {
 	testCases := []TestCase{
@@ -41,11 +44,10 @@ func (s *Suite) TestUnitDefaultDecryption() {
 			Assert: func() {
 				pwdKey := []byte("defaultPwdKey")
 				// Setup dir structure.
-				inFilePath := "./tests/lorem_data_in/lorem.md"
 				outFilePath := "./tests/lorem_enc"
 				outFile := outFilePath + "/lorem.md"
 				_ = os.Mkdir(outFilePath, os.ModePerm)
-				copyFileToEnc(s.T(), inFilePath, outFile)
+				copyFileToEnc(s.T(), testLoremInFile, outFile)
 
 				// Get listing of the temporary out path.
 				fl, err := ListFiles(outFilePath, DefaultPathWalkerFunc)

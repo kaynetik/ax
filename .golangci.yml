@@ -78,7 +78,7 @@ linters:
     - paralleltest
     - tparallel
     - wrapcheck
-    #    - forbidigo
+    - forbidigo
     - makezero
     - predeclared
     - thelper
