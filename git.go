@@ -16,6 +16,7 @@ const (
 	cmdGitForcePushToMaster = "push -u origin master --force"
 
 	commitMessageStatic = ":art:Test_Commit_Message"
+	zeroInt             = int(0)
 )
 
 // ErrCmdWrapFn - func used to wrap errors caused by executeCommand, if any.
@@ -37,33 +38,66 @@ func executeCommand(cmd, cmdArgs string) error {
 }
 
 // PushToGIT - used to commit&push created archive(s) to the remote GIT Repository.
-func PushToGIT(gitRepo string) error {
-	err := gitInit()
+func PushToGIT(gitRepo string, args ...gitChain) error {
+	gc := gitChain{}
+
+	if args == nil {
+		gc = buildDefaultForcePushGitChain()
+	} else {
+		gc = args[zeroInt]
+	}
+
+	err := gc.gitInit()
 	if err != nil {
 		return ErrCmdWrapFn(cmdGit, cmdGitInit, err)
 	}
 
-	err = gitAddRemote(gitRepo)
+	err = gc.gitAddRemote(gitRepo)
 	if err != nil {
 		return fmt.Errorf("failed adding git remote: %w", err)
 	}
 
-	err = gitStageDot()
+	err = gc.gitStageDot()
 	if err != nil {
 		return fmt.Errorf("failed staging changes: %w", err)
 	}
 
-	err = gitCommitM(commitMessageStatic)
+	err = gc.gitCommitM(commitMessageStatic)
 	if err != nil {
 		return fmt.Errorf("failed committing changes: %w", err)
 	}
 
-	err = gitForcePushMaster()
+	err = gc.gitForcePushMaster()
 	if err != nil {
 		return fmt.Errorf("failed pushing changes: %w", err)
 	}
 
 	return nil
+}
+
+type (
+	gitCmdExec    func() error
+	gitCmdStrExec func(string) error
+)
+
+type gitChain struct {
+	gitInit            gitCmdExec
+	gitAddRemote       gitCmdStrExec
+	gitStageDot        gitCmdExec
+	gitCommitM         gitCmdStrExec
+	gitForcePushMaster gitCmdExec
+}
+
+// buildDefaultForcePushGitChain - used to generate defaults for gitChain which will be used to force push
+// to the initialized Git Repo.
+func buildDefaultForcePushGitChain() gitChain {
+	return gitChain{
+		gitInit:            gitInit,
+		gitAddRemote:       gitAddRemote,
+		gitStageDot:        gitStageDot,
+		gitCommitM:         gitCommitM,
+		gitForcePushMaster: gitForcePushMaster,
+	}
 }
 
 func gitInit() error {
@@ -102,7 +136,7 @@ func gitStageDot() error {
 // TODO: Make commit message dynamic - based on metadata
 // [GH Issue #2](https://github.com/kaynetik/ax/issues/2)
 func gitCommitM(commitMsg string) error {
-	err := executeCommand(cmdGit, fmt.Sprintf(`%s "%s"`, cmdGitCommitDashM, commitMsg))
+	err := executeCommand(cmdGit, fmt.Sprintf(`%s %s`, cmdGitCommitDashM, commitMsg))
 	if err != nil {
 		return err
 	}
