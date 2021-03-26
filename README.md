@@ -14,10 +14,10 @@
 
 ##### Check out the [GH Project Dashboard](https://github.com/kaynetik/ax/projects/1) for more info on all the tasks that have to be completed before AX will reach a stable version.
 
-AX provides the ability to easily create password-protected archives from chosen directory, and apply an additional
-layer of AES encryption once first iteration has been completed. Passwords which are used for Archive protection and AES
-encryption can (and SHOULD) be different. Recommended length is `> 14` for better entropy, and as complex as you can get
-it.
+AX provides the ability to easily create password-protected archives from the chosen directory, and apply an additional
+layer of AES encryption once the first iteration has been completed. Passwords which are used for Archive protection and
+AES encryption can (and SHOULD) be different. The recommended length is `> 14` for better entropy, and as complex as you
+can get it.
 
 ----
 
@@ -27,10 +27,10 @@ it.
 
 ## Getting Started
 
-Currently, in active development - should become stable by second week of April '21. Do not use until version badge
+Currently, in active development - should become stable by the second week of April '21. Do not use until version badge
 becomes :green_heart: until adequate testing coverage has been applied.
 
-Feel free to download preferred version from the [releases page](https://github.com/kaynetik/ax/releases). Most
+Feel free to download the preferred version from the [releases page](https://github.com/kaynetik/ax/releases). Most
 operating systems & architectures are supported.
 
 If you wish to use it as a module for your own product, you can
@@ -49,14 +49,14 @@ $ ./ax # To enter interactive mode don't provide any flags
 $ ./ax -arc-in ../tmp_to_archive -arc-pass on -arc-out ../tmp_archive_out # Example usage with flags
 ```
 
-Example above was to download latest release for `linux x86_64` architecture. Same oneliner will work for any OS, you
-just need to alter `grep` counterpart, i.e. instead of ` linux_x86_64` place `windows_x86_64`.
+The example above was to download the latest release for `linux x86_64` architecture. The same oneliner will work for
+any OS, you just need to alter `grep` counterpart, i.e. instead of ` linux_x86_64` place `windows_x86_64`.
 
-Refer to makefile for examples of CLI usage. Proper examples will be provided before first stable release.
+Refer to the Makefile for examples of CLI usage. Proper examples will be provided before the first stable release.
 
 ## This is still WIP
 
-#### Current focus are the following:
+#### Current focus is the following:
 
 Precise info on priorities can be reached on the [GH Issues Page](https://github.com/kaynetik/ax/issues).
 
