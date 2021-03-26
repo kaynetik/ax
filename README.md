@@ -7,7 +7,7 @@
 ![GolangCI](https://github.com/kaynetik/ax/workflows/golangci/badge.svg?branch=main)
 ![Build](https://github.com/kaynetik/ax/workflows/Build/badge.svg?branch=main)
 [![release](https://github.com/kaynetik/ax/actions/workflows/release.yml/badge.svg)](https://github.com/kaynetik/ax/actions/workflows/release.yml)
-[![Version](https://img.shields.io/badge/version-v0.0.13-purple.svg)](https://github.com/kaynetik/ax/releases)
+[![Version](https://img.shields.io/badge/version-v0.0.14-purple.svg)](https://github.com/kaynetik/ax/releases)
 [![Coverage Status](https://coveralls.io/repos/github/kaynetik/ax/badge.svg?branch=main)](https://coveralls.io/github/kaynetik/ax?branch=main)
 
 #### _NOTE: This is a Work In Progress_
